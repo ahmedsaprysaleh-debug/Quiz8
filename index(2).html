@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الاختبار العاشر - الكمبيوترات</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--green:#234f3a;--green2:#2f6b4f;--cream:#faf6ee;--card:#fff;--line:#e6e0d2;--ink:#1d2a24;--ok:#1e8e4e;--bad:#c0392b;--okbg:#e6f6ec;--badbg:#fdebe9}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:'Tajawal',Tahoma,sans-serif;font-size:17px;line-height:1.7}
+header{background:var(--green);color:#fff;text-align:center;padding:42px 16px 30px;position:sticky;top:0;z-index:10;box-shadow:0 2px 10px #0003}
+header h1{margin:0;font-size:30px;font-weight:800}
+header p{margin:6px 0 16px;opacity:.85;font-size:16px}
+.bar{max-width:1080px;margin:auto;height:10px;background:#ffffff40;border-radius:9px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:#f0e6cf;border-radius:9px;transition:width .25s}
+.cnt{font-size:14px;margin-top:6px;opacity:.9}
+main{max-width:1080px;margin:24px auto 60px;padding:0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px 28px;margin-bottom:20px}
+.card.miss{border-color:var(--bad);box-shadow:0 0 0 3px #c0392b22}
+label.f{display:block;font-weight:700;margin-bottom:10px}
+label.f b{color:#c0392b}
+input[type=text],input[type=tel]{width:100%;padding:16px;border:1px solid var(--line);border-radius:10px;background:#faf8f3;font:inherit}
+input[type=text]:focus,input[type=tel]:focus{outline:2px solid var(--green2)}
+h2{color:var(--green);font-size:24px;margin:38px 0 16px;padding-bottom:8px;border-bottom:3px solid var(--green)}
+.q{font-weight:700;margin-bottom:12px}
+.opt{display:flex;align-items:center;gap:12px;padding:9px 14px;margin:6px 0;border-radius:10px;cursor:pointer;border:1px solid transparent}
+.opt:hover{background:#f4efe3}
+.opt input{width:20px;height:20px;accent-color:var(--green2);flex:none}
+.opt.ok{background:var(--okbg);border-color:var(--ok)}
+.opt.bad{background:var(--badbg);border-color:var(--bad)}
+.en{direction:ltr;unicode-bidi:isolate;display:inline-block}
+button{font:inherit;font-weight:700;background:var(--green);color:#fff;border:0;border-radius:12px;padding:16px 40px;cursor:pointer;font-size:19px}
+button:hover{background:var(--green2)}
+button.sec{background:#fff;color:var(--green);border:2px solid var(--green)}
+.err{color:var(--bad);font-weight:700;margin:12px 0;min-height:26px}
+#res{display:none;text-align:center;border:2px solid var(--green)}
+#res .sc{font-size:54px;font-weight:800;color:var(--green)}
+#res .gd{font-size:20px;margin-bottom:14px}
+.note{font-size:15px;margin-top:10px;font-weight:700}
+.note.ok{color:var(--ok)}.note.bad{color:var(--bad)}
+@media(max-width:600px){header h1{font-size:21px}.card{padding:18px}}
+@media print{header{position:static}button{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title"></h1>
+  <p>50 سؤالاً - إجابة كل سؤال بنقطة واحدة</p>
+  <div class="bar"><i id="pb"></i></div>
+  <div class="cnt"><span id="done">0</span> / 50</div>
+</header>
+<main>
+  <div class="card"><label class="f" for="nm">الاسم الثلاثي: <b>*</b></label><input type="text" id="nm" autocomplete="name"></div>
+  <div class="card"><label class="f" for="ph">رقم الهاتف: <b>*</b></label><input type="tel" id="ph" inputmode="tel" dir="ltr" style="text-align:right"></div>
+  <div id="qs"></div>
+  <div class="err" id="err"></div>
+  <button id="sub">إرسال الإجابات</button>
+  <div class="card" id="res" style="margin-top:28px">
+    <div id="rname" style="font-weight:700"></div>
+    <div class="sc" id="rsc"></div>
+    <div class="gd" id="rgd"></div>
+    <button class="sec" onclick="location.reload()">إعادة الاختبار</button>
+    <button class="sec" onclick="window.print()">طباعة النتيجة</button>
+  </div>
+</main>
+<script>
+const TITLE="الاختبار العاشر - الوحدة السابعة: الكمبيوترات";
+document.getElementById('title').textContent=TITLE;document.title=TITLE;
+const L=["أ","ب","ت","ث"];
+const SECTIONS=[
+ {t:"القسم الأول: بنية الكمبيوتر (1–18)",n:18},
+ {t:"القسم الثاني: برامج الكمبيوتر (19–32)",n:14},
+ {t:"القسم الثالث: الدوائر المنطقية (33–50)",n:18}
+];
+// [السؤال, الإجابة الصحيحة, خطأ1, خطأ2, خطأ3]  - يتم خلط الاختيارات تلقائيًا
+const Q=[
+["عدد المكونات الرئيسية الخمسة للكمبيوتر هو:","5 مكونات","3 مكونات","4 مكونات","6 مكونات"],
+["المكون الذي ينفذ التعليمات ويُصدر الأوامر لكل وظيفة هو:","وحدة التحكم","وحدة الحساب والمنطق","جهاز الإدخال","جهاز الإخراج"],
+["المكون المسؤول عن إجراء الحسابات (Calculations) هو:","وحدة الحساب والمنطق (ALU)","وحدة التحكم (CU)","الذاكرة الرئيسية","جهاز الإخراج"],
+["يُشار إلى وحدة التحكم ووحدة الحساب والمنطق معًا باسم:","المعالج (Processor / CPU)","الذاكرة الرئيسية","الواجهة","برنامج التشغيل"],
+["الذاكرة الرئيسية (RAM) تخزن البرامج والبيانات:","مؤقتًا","إلى الأبد","على المدى الطويل فقط","لا تخزن شيئًا"],
+["الجهاز المستخدم لتخزين البرامج والبيانات على المدى الطويل هو:","الذاكرة الثانوية (التخزين)","الذاكرة الرئيسية (RAM)","وحدة التحكم","الشاشة"],
+["أي مما يلي يُعد جهاز إدخال؟","لوحة المفاتيح","الشاشة","الطابعة","SSD"],
+["أي مما يلي يُعد جهاز إخراج؟","الطابعة","الفأرة","لوحة المفاتيح","الماسح الضوئي"],
+["أي مما يلي من أجهزة التخزين الثانوية؟","ذاكرة USB","الشاشة","الفأرة","الطابعة"],
+["الأجهزة الطرفية (Peripheral devices) هي:","أجهزة تُستخدم عن طريق توصيلها بجهاز كمبيوتر","الكمبيوتر نفسه فقط","أجهزة لتخزين البرامج مؤقتًا فقط","مكونات تتوسط تبادل المعلومات"],
+["أي مما يلي ليس من الأجهزة الطرفية؟","وحدة المعالجة المركزية (CPU)","لوحة المفاتيح","الطابعة","الشاشة"],
+["في رسم علاقة المكونات، يكون تدفق التحكم موجهًا من:","وحدة التحكم نحو جميع الأجهزة","الشاشة نحو المعالج","الفأرة نحو الشاشة","الذاكرة الثانوية نحو الطابعة"],
+["تتدفق البيانات مباشرة من جهاز الإدخال إلى:","الذاكرة الرئيسية","الذاكرة الثانوية","وحدة التحكم","جهاز الإخراج"],
+["الواجهة (Interface) هي:","مكون يتوسط تبادل المعلومات لتوصيل الكمبيوتر الرئيسي بالأجهزة الطرفية","جهاز يخزن البيانات مؤقتًا","برنامج يعالج النصوص","وحدة تنفذ العمليات الحسابية"],
+["الواجهة الأكثر استخدامًا للأجهزة الطرفية للكمبيوتر هي:","USB","HDMI","Ethernet","SSD"],
+["الواجهة التي تسمح بنقل الفيديو والصوت والبيانات عبر كابل واحد هي:","HDMI","USB","Ethernet","RAM"],
+["معيار الاتصال المستخدم في الشبكات المحلية السلكية (LAN) في المنزل والمكتب هو:","Ethernet","HDMI","USB","CPU"],
+["الواجهة المناسبة للتوصيل بالمحاور (Hubs) وأجهزة التوجيه (Routers) هي:","Ethernet","HDMI","USB","SSD"],
+["الأجهزة (Hardware) هي:","أجهزة مثل وحدة الكمبيوتر الرئيسية والأجهزة الطرفية","البرامج والبيانات التي تعمل على الكمبيوتر","برنامج يشغّل الأجهزة المتصلة","برامج معالجة النصوص"],
+["أي مما يلي مثال على الأجهزة (Hardware)؟","CPU","Windows","macOS","برنامج جداول البيانات"],
+["البرمجيات (Software) هي:","البرامج والبيانات التي تعمل على العتاد","الأجزاء المادية للكمبيوتر","الكابلات والمنافذ","وحدة التحكم فقط"],
+["برمجيات النظام هي:","البرامج اللازمة لتشغيل العتاد","برامج الألعاب فقط","برامج تعمل فوق برامج التطبيق","الأجهزة الطرفية"],
+["نظام التشغيل (OS) هو نوع من برامج النظام مسؤول عن:","الوظائف الأساسية للكمبيوتر","إنشاء الجداول الحسابية فقط","طباعة المستندات فقط","تخزين البيانات مؤقتًا في الذاكرة"],
+["أي مما يلي من وظائف نظام التشغيل؟","إدارة الملفات","تحرير الصور","إنشاء الجداول الحسابية","تنسيق النصوص"],
+["أي مما يلي مثال على نظام التشغيل؟","Android OS","Ethernet","SSD","HDMI"],
+["برنامج التطبيق (Application software) هو:","البرامج التي تعمل فوق برنامج النظام","البرامج اللازمة لتشغيل العتاد فقط","الجهاز المتصل بالحاسب","برنامج يدير الذاكرة والملفات"],
+["أي مما يلي مثال على برامج التطبيقات؟","برنامج معالجة النصوص","Windows","macOS","Device driver"],
+["أجهزة iPhone مجهزة بنظام التشغيل:","iOS","Android","Windows","Ethernet"],
+["أي العبارات التالية صحيحة؟","الهواتف الذكية تأتي مجهزة بنظام تشغيل","الهواتف الذكية لا تحتاج إلى نظام تشغيل","نظام التشغيل من برامج التطبيقات","برنامج التطبيق يعمل بدون برنامج النظام"],
+["برنامج تشغيل الجهاز (Device driver) هو:","برنامج يتحكم في الاتصال بين الجهاز المتصل والبرمجيات على الحاسب","جهاز إدخال","نوع من أنواع الذاكرة","برنامج لمعالجة النصوص"],
+["الاسم المختصر لبرنامج تشغيل الجهاز هو:","Driver","Interface","Processor","Router"],
+["أي العبارات التالية صحيحة؟","لا يمكن لبرنامج التطبيق أن يعمل بدون برنامج النظام","برنامج التطبيق يعمل قبل برنامج النظام","نظام التشغيل من برامج التطبيقات","برنامج النظام لا يتحكم في العتاد"],
+["في أجهزة الكمبيوتر، تُعالج القيمة \"1\" في العمليات المنطقية على أنها:","صحيحة (true)","خاطئة (false)","فارغة","غير معرّفة"],
+["في أجهزة الكمبيوتر، تُعالج القيمة \"0\" في العمليات المنطقية على أنها:","خاطئة (false)","صحيحة (true)","رقم كبير","تعليمة"],
+["الدائرة المنطقية (Logic circuit) هي:","دائرة مصممة لأداء عمليات منطقية","دائرة لتخزين البيانات مؤقتًا","كابل لنقل الفيديو","برنامج لتشغيل الأجهزة"],
+["جدول الصواب (Truth table) هو:","جدول يوضح جميع المجموعات الممكنة للمدخلات والمخرجات لدائرة منطقية","جدول يعرض أسعار الأجهزة","جدول لتخزين الملفات","جدول بأسماء البرامج"],
+["بوابة AND تُخرج 1 فقط عندما:","تكون جميع المدخلات 1","يكون مدخل واحد على الأقل 1","تكون جميع المدخلات 0","يكون المدخل 0"],
+["في بوابة AND: إذا كان A=1 و B=0 فإن المخرج X يساوي:","0","1","2","لا يمكن تحديده"],
+["بوابة OR تُخرج 1 إذا:","كان هناك على الأقل مدخل واحد يساوي 1","كانت جميع المدخلات 0","كانت جميع المدخلات 1 فقط","كان المدخل معكوسًا"],
+["في بوابة OR: إذا كان A=0 و B=0 فإن المخرج X يساوي:","0","1","2","لا يمكن تحديده"],
+["في بوابة OR: إذا كان A=1 و B=0 فإن المخرج X يساوي:","1","0","2","لا يمكن تحديده"],
+["دائرة NOT (العاكسة) تُخرج:","النتيجة المعاكسة للمدخل","نفس قيمة المدخل","1 دائمًا","0 دائمًا"],
+["في دائرة NOT: إذا كان المدخل A=0 فإن المخرج X يساوي:","1","0","2","لا يمكن تحديده"],
+["الاسم العربي لبوابة NOT هو:","دائرة العاكسة","دائرة الاقتران المنطقية","دائرة الانفصال المنطقية","دائرة الجمع النصفي"],
+["الاسم العربي لبوابة AND هو:","دائرة الاقتران المنطقية","دائرة الانفصال المنطقية","دائرة العاكسة","دائرة الجمع الكامل"],
+["تتكون دائرة الجمع النصفي (Half adder) من بوابات:","AND و OR و NOT","AND فقط","OR فقط","NOT فقط"],
+["دائرة الجمع النصفي تمثل:","جمع أعداد مكونة من رقم واحد (bit)","جمع أعداد من ثلاثة أرقام","طرح الأعداد فقط","تخزين الأعداد"],
+["في دائرة الجمع النصفي: عندما A=1 و B=1 تكون قيمتا S و C:","S=0 و C=1","S=1 و C=0","S=1 و C=1","S=0 و C=0"],
+["في دائرة الجمع النصفي: عندما A=0 و B=1 تكون قيمتا S و C:","S=1 و C=0","S=0 و C=1","S=1 و C=1","S=0 و C=0"],
+["دائرة الجمع الكامل (Full adder) هي دائرة:","تأخذ في الاعتبار النقل من الـbit الأدنى والنقل إلى الـbit الأعلى","تجمع bit واحد فقط بدون نقل","تعكس قيمة المدخل","تخزن البيانات مؤقتًا"],
+["دائرة AND يليها NOT على مخرجها: إذا كان A=1 و B=1 فإن المخرج X يساوي:","0","1","2","لا يمكن تحديده"],
+["في دائرة الجمع الكامل: عندما A=1 و B=1 و Cin=0 تكون قيمتا S و Cout:","S=0 و Cout=1","S=1 و Cout=0","S=1 و Cout=1","S=0 و Cout=0"]
+];
+
+// خلط ثابت (نفس الترتيب في كل مرة) حتى تتوزع الإجابات الصحيحة بين أ/ب/ت/ث
+let seed=2024;const rnd=()=>(seed=(seed*1103515245+12345)&0x7fffffff)/0x7fffffff;
+const items=Q.map(r=>{const o=r.slice(1).map((t,i)=>({t,c:i===0}));
+  for(let i=o.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[o[i],o[j]]=[o[j],o[i]]}
+  return{q:r[0],o,a:o.findIndex(x=>x.c)}});
+
+const fmt=s=>s.replace(/([A-Za-z][A-Za-z0-9 ()\/.=\-]*[A-Za-z0-9)])/g,'<span class="en">$1</span>');
+const qs=document.getElementById('qs');let idx=0,html='';
+SECTIONS.forEach(s=>{html+=`<h2>${s.t}</h2>`;
+ for(let k=0;k<s.n;k++,idx++){const it=items[idx];
+  html+=`<div class="card" id="c${idx}"><div class="q">${idx+1}- ${fmt(it.q)}</div>`+
+  it.o.map((o,j)=>`<label class="opt" id="o${idx}_${j}"><input type="radio" name="q${idx}" value="${j}"><span>${L[j]}) ${fmt(o.t)}</span></label>`).join('')+`</div>`}});
+qs.innerHTML=html;
+
+const upd=()=>{const n=items.filter((_,i)=>document.querySelector(`input[name=q${i}]:checked`)).length;
+ document.getElementById('done').textContent=n;document.getElementById('pb').style.width=(n/50*100)+'%'};
+qs.addEventListener('change',e=>{e.target.closest('.card').classList.remove('miss');upd()});
+
+document.getElementById('sub').onclick=()=>{
+ const err=document.getElementById('err');err.textContent='';
+ const nm=document.getElementById('nm').value.trim(),ph=document.getElementById('ph').value.trim();
+ if(nm.split(/\s+/).length<3){err.textContent='من فضلك اكتب الاسم الثلاثي كاملًا.';document.getElementById('nm').focus();return}
+ if(!/^[0-9٠-٩+\s-]{10,15}$/.test(ph)){err.textContent='من فضلك اكتب رقم هاتف صحيح.';document.getElementById('ph').focus();return}
+ const miss=[];items.forEach((_,i)=>{if(!document.querySelector(`input[name=q${i}]:checked`))miss.push(i)});
+ if(miss.length){miss.forEach(i=>document.getElementById('c'+i).classList.add('miss'));
+  err.textContent=`لم تجب عن ${miss.length} سؤال. أرقام الأسئلة: ${miss.map(i=>i+1).join('، ')}`;
+  document.getElementById('c'+miss[0]).scrollIntoView({behavior:'smooth',block:'center'});return}
+ let score=0;
+ items.forEach((it,i)=>{const v=+document.querySelector(`input[name=q${i}]:checked`).value;
+  if(v===it.a)score++;
+  document.getElementById(`o${i}_${it.a}`).classList.add('ok');
+  if(v!==it.a)document.getElementById(`o${i}_${v}`).classList.add('bad');
+  const c=document.getElementById('c'+i);
+  c.insertAdjacentHTML('beforeend',`<div class="note ${v===it.a?'ok':'bad'}">${v===it.a?'✔ إجابة صحيحة':'✘ الإجابة الصحيحة: '+L[it.a]+') '+it.o[it.a].t}</div>`);
+  c.querySelectorAll('input').forEach(x=>x.disabled=true)});
+ const p=Math.round(score/50*100);
+ document.getElementById('rname').textContent=nm;
+ document.getElementById('rsc').textContent=`${score} / 50`;
+ document.getElementById('rgd').textContent=`النسبة ${p}% - `+(p>=90?'ممتاز 🌟':p>=75?'جيد جدًا 👏':p>=50?'جيد، راجع الأخطاء':'تحتاج مراجعة الدرس');
+ document.getElementById('sub').style.display='none';
+ const r=document.getElementById('res');r.style.display='block';r.scrollIntoView({behavior:'smooth'});
+};
+</script>
+</body>
+</html>
